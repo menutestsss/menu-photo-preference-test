@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Menu Comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fff;--ink:#0d0d0d;--ink2:#4d4d4d;--line:#e3e3e3;--soft:#f4f4f4;--accent:#0d0d0d;--onaccent:#fff;--sel:#1f6feb}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit;cursor:pointer}
+  .screen{display:none;min-height:100%}
+  .screen.on{display:flex}
+  /* intro / done / questions */
+  .card-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+  .card{max-width:520px;width:100%}
+  h1{font-size:26px;line-height:1.2;margin:0 0 12px;font-weight:700;letter-spacing:-.01em}
+  h2{font-size:19px;line-height:1.3;margin:0 0 12px;font-weight:600}
+  p{font-size:16px;line-height:1.5;color:var(--ink2);margin:0 0 14px}
+  ol{padding-left:20px;margin:0 0 20px;color:var(--ink2);line-height:1.55}
+  .btn{display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 22px;border-radius:12px;border:0;background:var(--accent);color:var(--onaccent);font-weight:600;font-size:16px;width:100%}
+  .btn[disabled]{opacity:.35;cursor:not-allowed}
+  .btn.ghost{background:var(--soft);color:var(--ink)}
+  .q{margin:0 0 22px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .opts .wide{grid-column:1 / -1}
+  .opt{height:52px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:600;font-size:16px}
+  .opt.sel{border-color:var(--sel);background:#eef4ff;color:#0b3d91}
+  .opt.wide{font-weight:500;color:var(--ink2);height:44px;font-size:15px}
+  .opt.wide.sel{color:#0b3d91}
+  .row{display:flex;gap:8px;margin-top:8px}
+  .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:28px;font-weight:700;letter-spacing:.06em;background:var(--soft);border-radius:12px;padding:16px;text-align:center;margin:8px 0 16px;user-select:all}
+  .hint{font-size:14px;color:var(--ink2)}
+  /* compare screen */
+  #compare{flex-direction:column;height:100%;height:100dvh}
+  .bar{flex:none;display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:#fff;z-index:2;flex-wrap:wrap}
+  .round{font-size:13px;color:var(--ink2);white-space:nowrap}
+  .seg{display:flex;background:var(--soft);border-radius:999px;padding:3px;flex:1;min-width:200px;max-width:360px}
+  .seg button{flex:1;height:38px;border:0;border-radius:999px;background:transparent;font-weight:600;font-size:15px;color:var(--ink2)}
+  .seg button.on{background:var(--accent);color:var(--onaccent)}
+  .bar .btn{width:auto;height:40px;padding:0 16px;font-size:15px;margin-left:auto}
+  .tip{flex-basis:100%;font-size:13px;color:var(--ink2);margin:0}
+  .frames{flex:1;position:relative}
+  .frames iframe{position:absolute;inset:0;width:100%;height:100%;border:0;visibility:hidden}
+  .frames iframe.on{visibility:visible}
+  @media (max-width:560px){
+    .bar .btn{flex-basis:100%;margin-left:0}
+    .seg{max-width:none}
+  }
+</style>
+</head>
+<body>
+
+<section class="screen on" id="intro"><div class="card-wrap"><div class="card">
+  <h1>Which menu looks better?</h1>
+  <p>You'll see a restaurant's online ordering menu shown two different ways. The dishes and prices are the same; only the photos change.</p>
+  <ol>
+    <li>Tap between the two menus at the top as often as you like.</li>
+    <li>Scroll through, look at the dishes, and open any that catch your eye.</li>
+    <li>When you're ready, answer two quick questions. Please think out loud as you go.</li>
+  </ol>
+  <p class="hint">There are 2 rounds. It takes about 5 minutes.</p>
+  <button class="btn" id="start">Start</button>
+</div></div></section>
+
+<section class="screen" id="compare">
+  <div class="bar">
+    <span class="round" id="roundLbl"></span>
+    <div class="seg" role="tablist" aria-label="Choose menu version">
+      <button role="tab" id="tab0"></button>
+      <button role="tab" id="tab1"></button>
+    </div>
+    <button class="btn" id="ready" disabled>I'm ready to answer</button>
+    <p class="tip" id="tip">Look at both menus before you answer.</p>
+  </div>
+  <div class="frames"><iframe id="f0" title="Menu version 1"></iframe><iframe id="f1" title="Menu version 2"></iframe></div>
+</section>
+
+<section class="screen" id="questions"><div class="card-wrap"><div class="card">
+  <p class="round" id="qRoundLbl"></p>
+  <div class="q"><h2>Which menu looks more appetizing?</h2><div class="opts" data-q="0"></div></div>
+  <div class="q"><h2>Which restaurant would you be more likely to order from?</h2><div class="opts" data-q="1"></div></div>
+  <p class="hint">Please say out loud <b>why</b> you picked what you did.</p>
+  <div class="row">
+    <button class="btn ghost" id="back">Look again</button>
+    <button class="btn" id="next" disabled>Next</button>
+  </div>
+</div></div></section>
+
+<section class="screen" id="done"><div class="card-wrap"><div class="card">
+  <h1>Thanks, you're done!</h1>
+  <p>Your completion code:</p>
+  <div class="code" id="code"></div>
+  <p class="hint">Please enter this code in the next question.</p>
+</div></div></section>
+
+<script>
+// --- randomized, blind assignment -----------------------------------------
+// Each round compares the original photos against one enhanced style.
+// Round order and which side (first/second tab) shows the enhanced menu are randomized per participant.
+const STYLES = { '2': 'm-v2/', '3': 'm-v3/' };
+const LETTERS = [['A','B'],['C','D']];
+function rnd(){ try{ return crypto.getRandomValues(new Uint32Array(1))[0] / 2**32; }catch(e){ return Math.random(); } }
+function store(k,v){ try{ if(v===undefined) return JSON.parse(sessionStorage.getItem(k)); sessionStorage.setItem(k,JSON.stringify(v)); }catch(e){ return null; } }
+
+let plan = store('ut-plan');
+if(!plan){
+  const order = rnd() < .5 ? ['2','3'] : ['3','2'];
+  plan = order.map(s => ({ style:s, enhSide: rnd() < .5 ? 0 : 1, ans:[null,null] }));
+  store('ut-plan', plan);
+}
+let r = 0, cur = 0;
+const seen = [false,false];
+const $ = id => document.getElementById(id);
+const show = id => document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id===id));
+
+function loadRound(){
+  const P = plan[r], L = LETTERS[r];
+  for(let i=0;i<2;i++){
+    const v = i===P.enhSide ? 'after' : 'before';
+    $('f'+i).src = STYLES[P.style] + '?v=' + v;
+    $('tab'+i).textContent = 'Menu ' + L[i];
+  }
+  $('roundLbl').textContent = 'Round ' + (r+1) + ' of 2';
+  $('qRoundLbl').textContent = 'Round ' + (r+1) + ' of 2 · Menu ' + L[0] + ' vs Menu ' + L[1];
+  seen[0]=seen[1]=false; cur=0; pick(0, true);
+  // build answer buttons
+  document.querySelectorAll('#questions .opts').forEach(box => {
+    const q = +box.dataset.q;
+    box.innerHTML = '';
+    [['A',L[0]],['B',L[1]],['N','No difference']].forEach(([val,label],j) => {
+      const b = document.createElement('button');
+      b.className = 'opt' + (j===2 ? ' wide' : '');
+      b.textContent = j===2 ? label : 'Menu ' + label;
+      b.onclick = () => { plan[r].ans[q] = val; store('ut-plan', plan);
+        box.querySelectorAll('.opt').forEach(o => o.classList.toggle('sel', o===b)); updNext(); };
+      if(plan[r].ans[q]===val) b.classList.add('sel');
+      box.appendChild(b);
+    });
+  });
+  updNext();
+}
+function scrollOf(f){ try{ return f.contentWindow.scrollY || 0; }catch(e){ return 0; } }
+function pick(i, initial){
+  const from = $('f'+cur), to = $('f'+i);
+  if(!initial && i!==cur){ try{ to.contentWindow.scrollTo(0, scrollOf(from)); }catch(e){} }
+  cur = i; seen[i] = true;
+  for(let j=0;j<2;j++){ $('f'+j).classList.toggle('on', j===i); $('tab'+j).classList.toggle('on', j===i); $('tab'+j).setAttribute('aria-selected', j===i); }
+  const ok = seen[0] && seen[1];
+  $('ready').disabled = !ok;
+  $('tip').textContent = ok ? 'Switch back and forth as much as you like.' : 'Look at both menus before you answer.';
+}
+function updNext(){ const a = plan[r].ans; $('next').disabled = !(a[0] && a[1]); $('next').textContent = r===1 ? 'Finish' : 'Next round'; }
+
+// Code per round: <style><side of enhanced A|B><Q1 A|B|N><Q2 A|B|N>, rounds joined by '-'.  Decode at decode.html.
+function code(){ return plan.map(p => p.style + 'AB'[p.enhSide] + p.ans.join('')).join('-'); }
+
+$('start').onclick = () => { show('compare'); loadRound(); };
+$('tab0').onclick = () => pick(0);
+$('tab1').onclick = () => pick(1);
+$('ready').onclick = () => { show('questions'); window.scrollTo(0,0); };
+$('back').onclick = () => show('compare');
+$('next').onclick = () => {
+  if(r===0){ r=1; loadRound(); show('compare'); }
+  else { $('code').textContent = code(); show('done'); }
+};
+</script>
+</body>
+</html>
