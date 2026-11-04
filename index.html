@@ -26,6 +26,26 @@
   .hint{font-size:14px;color:var(--ink2)}
   .row{display:flex;gap:8px;margin-top:8px}
 
+  /* Brand dossier */
+  .dossier{max-width:680px;margin:0 auto;padding:28px 16px 40px}
+  .dtitle{margin-bottom:8px}
+  .dcard{border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:18px 0 20px;background:#fff}
+  .dhead{display:flex;gap:18px;align-items:center;padding:18px}
+  .dlogo{width:120px;height:120px;object-fit:contain;flex:none}
+  .dname{font-size:22px;margin:0 0 10px}
+  .facts{margin:0;display:grid;gap:6px}
+  .facts div{display:grid;grid-template-columns:56px 1fr;gap:8px;font-size:14px;line-height:1.4}
+  .facts dt{font-weight:600;color:var(--ink2);text-transform:uppercase;font-size:11px;letter-spacing:.05em;padding-top:2px}
+  .facts dd{margin:0}
+  .dext{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;background:var(--soft)}
+  .dstory{padding:18px 18px 4px}
+  .dstory h3{font-size:16px;margin:0 0 6px}
+  .dstory p{font-size:15px}
+  @media (max-width:480px){
+    .dhead{flex-direction:column;align-items:flex-start;gap:10px}
+    .dlogo{width:96px;height:96px}
+  }
+
   /* Part 1: item-level */
   #item{padding:16px 16px 96px;max-width:1080px;margin:0 auto}
   .ihead{margin:4px 0 16px}
@@ -87,10 +107,38 @@
 </head>
 <body>
 
+<!-- Brand dossier -->
+<section class="screen on" id="brand"><div class="dossier">
+  <p class="eyebrow">Before you start</p>
+  <h1 class="dtitle">Meet the restaurant</h1>
+  <p>Take a minute to get to know this diner. You'll be looking at food photos from its online menu next.</p>
+  <div class="dcard">
+    <div class="dhead">
+      <img class="dlogo" src="brand/logo.png" alt="Crazy Otto's Diner logo">
+      <div>
+        <h2 class="dname">Crazy Otto's Diner</h2>
+        <dl class="facts">
+          <div><dt>Food</dt><dd>Classic American diner: big breakfasts and homestyle lunch</dd></div>
+          <div><dt>Where</dt><dd>Two locations in Lancaster, California</dd></div>
+          <div><dt>Since</dt><dd>Early 1970s</dd></div>
+        </dl>
+      </div>
+    </div>
+    <img class="dext" src="brand/exterior.jpg" alt="Crazy Otto's Diner exterior on 20th St W, with a red EAT sign and an Open Breakfast &amp; Lunch sign">
+    <div class="dstory">
+      <h3>Welcome to Crazy Otto's Diner</h3>
+      <p>Welcome to Crazy Otto's Diner, where generous portions and classic diner favorites await you at every visit. Whether you're stopping by for a quick bite or a leisurely meal, both locations offer the warm, welcoming atmosphere that makes Crazy Otto's a local favorite.</p>
+      <h3>Our beginning in Lancaster</h3>
+      <p>"My name is Otto Lindsel, and Crazy Otto's Diner started in the early 1970s when I moved from the forests of the northern West Coast to the Antelope Valley to be closer to family. After years of cooking for lumberjacks, opening a diner felt natural. I wanted a place that served big breakfasts, fast service, and honest diner food."</p>
+    </div>
+  </div>
+  <button class="btn" id="toIntro">Continue</button>
+</div></section>
+
 <!-- Intro -->
-<section class="screen on" id="intro"><div class="center"><div class="card">
+<section class="screen" id="intro"><div class="center"><div class="card">
   <h1>Which food photos look better?</h1>
-  <p>You'll look at photos from a local diner's online ordering menu. The food is the same; only the photos change.</p>
+  <p>You'll look at photos from Crazy Otto's Diner's online ordering menu. The food is the same; only the photos change.</p>
   <ol>
     <li><b>Part 1:</b> for 10 dishes, pick the photo that makes you most want to order it.</li>
     <li><b>Part 2:</b> compare full menus and pick the one you'd rather order from.</li>
@@ -211,6 +259,7 @@ function updItem(){
   $('itemNext').disabled = !S.picks[k];
   $('itemNext').textContent = ii === ITEMS.length-1 ? 'Finish Part 1' : 'Next dish';
 }
+$('toIntro').onclick = () => show('intro');
 $('start').onclick = () => { ii = 0; renderItem(); show('item'); };
 $('itemNext').onclick = () => {
   if(ii < ITEMS.length-1){ ii++; renderItem(); window.scrollTo(0,0); }
