@@ -7,15 +7,17 @@
 <meta name="robots" content="noindex">
 <style>
   body{margin:0;background:#fff;color:#0d0d0d;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:24px 16px}
-  .wrap{max-width:820px;margin:0 auto}
+  .wrap{max-width:900px;margin:0 auto}
   h1{font-size:22px;margin:0 0 6px}
+  h2{font-size:17px;margin:24px 0 8px}
   p{color:#4d4d4d;margin:0 0 14px;line-height:1.5}
   textarea{width:100%;height:140px;font:14px ui-monospace,Menlo,monospace;padding:10px;border:1px solid #d6d6d6;border-radius:10px;box-sizing:border-box}
-  table{border-collapse:collapse;width:100%;margin:18px 0;font-size:14px}
-  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid #eee}
+  table{border-collapse:collapse;width:100%;margin:8px 0 18px;font-size:14px}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid #eee;vertical-align:top}
   th{font-weight:600;color:#4d4d4d}
-  .tal{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:12px}
-  .box{background:#f6f6f6;border-radius:12px;padding:14px}
+  td.n{text-align:right;font-variant-numeric:tabular-nums}
+  .tal{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .box{background:#f6f6f6;border-radius:12px;padding:14px;line-height:1.5;font-size:14px}
   .box h3{margin:0 0 8px;font-size:15px}
   .bad{color:#b42318}
   .scroll{overflow-x:auto}
@@ -23,39 +25,56 @@
 </head>
 <body><div class="wrap">
   <h1>Decode completion codes</h1>
-  <p>Paste participant codes, one per line (for example <code>2BAA-3ANB</code>). Each code says which menu showed the enhanced photos, so A/B picks become Enhanced, Original, or No difference.</p>
-  <textarea id="in" placeholder="2BAA-3ANB"></textarea>
-  <div class="tal" id="tal"></div>
-  <div class="scroll"><table id="out"></table></div>
+  <p>Paste participant codes, one per line, for example <code>O2332O3O22-2BAB-3AAB</code>. Part 1 = the photo version picked per dish. Part 2 = which menu won each round (A/B picks are mapped back to Enhanced, Original, or No difference).</p>
+  <textarea id="in" placeholder="O2332O3O22-2BAB-3AAB"></textarea>
+  <div id="res"></div>
 </div>
+<script src="study-data.js"></script>
 <script>
+const VER = { O: 'Original', '2': 'v2 (pro photoshoot)', '3': 'v3 (natural, in-restaurant)' };
 const STYLE = { '2': 'v2 (pro photoshoot)', '3': 'v3 (natural, in-restaurant)' };
-const pickName = (ans, enhSide) => ans === 'N' ? 'No difference' : ('AB'.indexOf(ans) === enhSide ? 'Enhanced' : 'Original');
+const pickName = (ans, side) => ans === 'N' ? 'No difference' : ('AB'.indexOf(ans) === side ? 'Enhanced' : 'Original');
+const pct = (a, n) => n ? Math.round(100 * a / n) + '%' : '–';
 function parse(code){
-  const rounds = code.trim().toUpperCase().split('-');
-  if(rounds.length !== 2 || !rounds.every(x => /^[23][AB][ABN][ABN]$/.test(x))) return null;
-  return rounds.map((x, i) => ({ round: i + 1, style: x[0], enhSide: 'AB'.indexOf(x[1]),
-    appetizing: pickName(x[2], 'AB'.indexOf(x[1])), order: pickName(x[3], 'AB'.indexOf(x[1])) }));
+  const p = code.trim().toUpperCase().split('-');
+  if(p.length !== 3 || !new RegExp('^[O23]{' + ITEMS.length + '}$').test(p[0]) || !p.slice(1).every(x => /^[23][AB][ABN][ABN]$/.test(x))) return null;
+  return { picks: p[0].split(''), rounds: p.slice(1).map((x, i) => { const side = 'AB'.indexOf(x[1]);
+    return { round: i + 1, style: x[0], appetizing: pickName(x[2], side), order: pickName(x[3], side) }; }) };
 }
 function render(){
   const lines = document.getElementById('in').value.split(/\s+/).filter(Boolean);
-  const t = { '2': {}, '3': {} };
-  let rows = '<tr><th>#</th><th>Code</th><th>Round</th><th>Style</th><th>More appetizing</th><th>More likely to order</th></tr>';
-  lines.forEach((c, n) => {
-    const d = parse(c);
-    if(!d){ rows += `<tr><td>${n+1}</td><td class="bad">${c.replace(/</g,'&lt;')}</td><td colspan="4" class="bad">invalid code</td></tr>`; return; }
-    d.forEach(x => {
-      rows += `<tr><td>${n+1}</td><td>${c}</td><td>${x.round}</td><td>${STYLE[x.style]}</td><td>${x.appetizing}</td><td>${x.order}</td></tr>`;
-      const s = t[x.style];
-      ['appetizing','order'].forEach(q => { s[q] = s[q] || {}; s[q][x[q]] = (s[q][x[q]] || 0) + 1; });
-    });
+  const ok = [], bad = [];
+  lines.forEach(c => { const d = parse(c); d ? ok.push(d) : bad.push(c); });
+  if(!lines.length){ document.getElementById('res').innerHTML = ''; return; }
+  const n = ok.length;
+  // Part 1
+  const tot = { O: 0, '2': 0, '3': 0 };
+  let rows = '<tr><th>Dish</th><th>Original</th><th>v2</th><th>v3</th></tr>';
+  ITEMS.forEach((it, k) => {
+    const c = { O: 0, '2': 0, '3': 0 };
+    ok.forEach(d => { c[d.picks[k]]++; tot[d.picks[k]]++; });
+    rows += `<tr><td>${it.name}</td>` + ['O','2','3'].map(v => `<td class="n">${c[v]} (${pct(c[v], n)})</td>`).join('') + '</tr>';
   });
-  document.getElementById('out').innerHTML = lines.length ? rows : '';
-  document.getElementById('tal').innerHTML = Object.entries(t).filter(([, s]) => s.appetizing).map(([k, s]) => {
-    const line = (q, lbl) => { const o = s[q], n = Object.values(o).reduce((a, b) => a + b, 0);
-      return `<div><b>${lbl}</b> (n=${n})<br>` + ['Enhanced','Original','No difference'].map(x => `${x}: ${o[x] || 0} (${Math.round(100 * (o[x] || 0) / n)}%)`).join('<br>') + '</div>'; };
-    return `<div class="box"><h3>${STYLE[k]}</h3>${line('appetizing','More appetizing')}<br>${line('order','More likely to order')}</div>`;
-  }).join('');
+  const all = n * ITEMS.length;
+  let h = `<h2>Part 1: photo picked per dish (n=${n} participants)</h2>`;
+  h += `<div class="tal"><div class="box"><h3>All dishes (${all} picks)</h3>` + ['O','2','3'].map(v => `${VER[v]}: ${tot[v]} (${pct(tot[v], all)})`).join('<br>') + '</div></div>';
+  h += `<div class="scroll"><table>${rows}</table></div>`;
+  // Part 2
+  h += '<h2>Part 2: full-menu rounds (enhanced vs original)</h2><div class="tal">';
+  ['2','3'].forEach(s => {
+    const rs = ok.flatMap(d => d.rounds.filter(r => r.style === s));
+    const line = (q, lbl) => { const c = {}; rs.forEach(r => c[r[q]] = (c[r[q]] || 0) + 1);
+      return `<b>${lbl}</b><br>` + ['Enhanced','Original','No difference'].map(x => `${x}: ${c[x] || 0} (${pct(c[x] || 0, rs.length)})`).join('<br>'); };
+    h += `<div class="box"><h3>${STYLE[s]} (n=${rs.length})</h3>${line('appetizing','More appetizing')}<br><br>${line('order','More likely to order')}</div>`;
+  });
+  h += '</div>';
+  // per participant
+  h += '<h2>Per participant</h2><div class="scroll"><table><tr><th>#</th><th>Code</th><th>Round 1</th><th>Round 2</th></tr>';
+  lines.forEach((c, i) => { const d = parse(c);
+    h += d ? `<tr><td>${i+1}</td><td>${c}</td>` + d.rounds.map(r => `<td>${STYLE[r.style]}: appetizing ${r.appetizing}, order ${r.order}</td>`).join('') + '</tr>'
+           : `<tr><td>${i+1}</td><td class="bad">${c.replace(/</g,'&lt;')}</td><td colspan="2" class="bad">invalid code</td></tr>`; });
+  h += '</table></div>';
+  document.getElementById('res').innerHTML = h;
 }
 document.getElementById('in').addEventListener('input', render);
 </script>

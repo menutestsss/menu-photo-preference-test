@@ -3,68 +3,127 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Menu Comparison</title>
+<title>Menu Photo Study</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#fff;--ink:#0d0d0d;--ink2:#4d4d4d;--line:#e3e3e3;--soft:#f4f4f4;--accent:#0d0d0d;--onaccent:#fff;--sel:#1f6feb}
+  :root{--bg:#fff;--ink:#0d0d0d;--ink2:#4d4d4d;--line:#e3e3e3;--soft:#f4f4f4;--accent:#0d0d0d;--onaccent:#fff;--sel:#1f6feb;--selbg:#eef4ff}
   *{box-sizing:border-box}
-  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Geist',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
   button{font:inherit;color:inherit;cursor:pointer}
-  .screen{display:none;min-height:100%}
-  .screen.on{display:flex}
-  /* intro / done / questions */
-  .card-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+  .screen{display:none}
+  .screen.on{display:block}
+  .center{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
   .card{max-width:520px;width:100%}
   h1{font-size:26px;line-height:1.2;margin:0 0 12px;font-weight:700;letter-spacing:-.01em}
   h2{font-size:19px;line-height:1.3;margin:0 0 12px;font-weight:600}
   p{font-size:16px;line-height:1.5;color:var(--ink2);margin:0 0 14px}
   ol{padding-left:20px;margin:0 0 20px;color:var(--ink2);line-height:1.55}
+  .eyebrow{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2);margin:0 0 8px}
   .btn{display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 22px;border-radius:12px;border:0;background:var(--accent);color:var(--onaccent);font-weight:600;font-size:16px;width:100%}
-  .btn[disabled]{opacity:.35;cursor:not-allowed}
+  .btn[disabled]{opacity:.3;cursor:not-allowed}
   .btn.ghost{background:var(--soft);color:var(--ink)}
-  .q{margin:0 0 22px}
-  .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .opts .wide{grid-column:1 / -1}
-  .opt{height:52px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:600;font-size:16px}
-  .opt.sel{border-color:var(--sel);background:#eef4ff;color:#0b3d91}
-  .opt.wide{font-weight:500;color:var(--ink2);height:44px;font-size:15px}
-  .opt.wide.sel{color:#0b3d91}
-  .row{display:flex;gap:8px;margin-top:8px}
-  .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:28px;font-weight:700;letter-spacing:.06em;background:var(--soft);border-radius:12px;padding:16px;text-align:center;margin:8px 0 16px;user-select:all}
   .hint{font-size:14px;color:var(--ink2)}
-  /* compare screen */
-  #compare{flex-direction:column;height:100%;height:100dvh}
-  .bar{flex:none;display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:#fff;z-index:2;flex-wrap:wrap}
+  .row{display:flex;gap:8px;margin-top:8px}
+
+  /* Part 1: item-level */
+  #item{padding:16px 16px 96px;max-width:1080px;margin:0 auto}
+  .ihead{margin:4px 0 16px}
+  .ihead h1{font-size:24px;margin:0 0 4px}
+  .ihead .q{font-size:16px;color:var(--ink2);margin:0}
+  .prog{height:4px;background:var(--soft);border-radius:4px;margin:0 0 16px;overflow:hidden}
+  .prog i{display:block;height:100%;background:var(--accent);transition:width .2s}
+  .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .choice{position:relative;border:0;padding:0;background:none;text-align:left;border-radius:14px}
+  .choice .ph{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;background:var(--soft);outline:3px solid transparent;outline-offset:3px;transition:outline-color .12s}
+  .choice .lab{position:absolute;top:10px;left:10px;min-width:34px;height:34px;padding:0 10px;border-radius:999px;background:rgba(255,255,255,.95);color:var(--ink);font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+  .choice.sel .ph{outline-color:var(--sel)}
+  .choice.sel .lab{background:var(--sel);color:#fff}
+  .foot{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom));z-index:5}
+  .foot .in{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:12px}
+  .foot .msg{font-size:14px;color:var(--ink2);flex:1}
+  .foot .btn{width:auto;min-width:160px}
+  @media (max-width:640px){
+    .trio{grid-template-columns:1fr;gap:12px}
+    .choice .ph{aspect-ratio:4/3}
+    .foot .msg{display:none}
+    .foot .btn{width:100%}
+  }
+
+  /* Part 2: photo-grid menu */
+  .bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.97);flex-wrap:wrap}
   .round{font-size:13px;color:var(--ink2);white-space:nowrap}
   .seg{display:flex;background:var(--soft);border-radius:999px;padding:3px;flex:1;min-width:200px;max-width:360px}
   .seg button{flex:1;height:38px;border:0;border-radius:999px;background:transparent;font-weight:600;font-size:15px;color:var(--ink2)}
   .seg button.on{background:var(--accent);color:var(--onaccent)}
   .bar .btn{width:auto;height:40px;padding:0 16px;font-size:15px;margin-left:auto}
   .tip{flex-basis:100%;font-size:13px;color:var(--ink2);margin:0}
-  .frames{flex:1;position:relative}
-  .frames iframe{position:absolute;inset:0;width:100%;height:100%;border:0;visibility:hidden}
-  .frames iframe.on{visibility:visible}
-  @media (max-width:560px){
+  .grid-wrap{max-width:1080px;margin:0 auto;padding:20px 16px 40px}
+  .rest{font-size:24px;font-weight:700;margin:0 0 4px}
+  .rest-sub{font-size:14px;color:var(--ink2);margin:0 0 24px}
+  .cat{margin:0 0 32px}
+  .cat h2{font-size:20px;margin:0 0 12px}
+  .tiles{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+  .tiles li{min-width:0}
+  .tiles img{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:var(--soft)}
+  .tiles .nm{font-size:14px;font-weight:500;margin-top:8px;overflow-wrap:anywhere}
+  @media (max-width:1023px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (max-width:639px){
+    .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     .bar .btn{flex-basis:100%;margin-left:0}
     .seg{max-width:none}
   }
+
+  /* questions + done */
+  .qq{margin:0 0 22px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .opts .wide{grid-column:1 / -1}
+  .opt{height:52px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:600;font-size:16px}
+  .opt.sel{border-color:var(--sel);background:var(--selbg);color:#0b3d91}
+  .opt.wide{font-weight:500;color:var(--ink2);height:44px;font-size:15px}
+  .opt.wide.sel{color:#0b3d91}
+  .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:22px;font-weight:700;letter-spacing:.04em;background:var(--soft);border-radius:12px;padding:16px;text-align:center;margin:8px 0 16px;user-select:all;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 
-<section class="screen on" id="intro"><div class="card-wrap"><div class="card">
-  <h1>Which menu looks better?</h1>
-  <p>You'll see a restaurant's online ordering menu shown two different ways. The dishes and prices are the same; only the photos change.</p>
+<!-- Intro -->
+<section class="screen on" id="intro"><div class="center"><div class="card">
+  <h1>Which food photos look better?</h1>
+  <p>You'll look at photos from a local diner's online ordering menu. The food is the same; only the photos change.</p>
   <ol>
-    <li>Tap between the two menus at the top as often as you like.</li>
-    <li>Scroll through, look at the dishes, and open any that catch your eye.</li>
-    <li>When you're ready, answer two quick questions. Please think out loud as you go.</li>
+    <li><b>Part 1:</b> for 10 dishes, pick the photo that makes you most want to order it.</li>
+    <li><b>Part 2:</b> compare full menus and pick the one you'd rather order from.</li>
   </ol>
-  <p class="hint">There are 2 rounds. It takes about 5 minutes.</p>
-  <button class="btn" id="start">Start</button>
+  <p class="hint">Please think out loud the whole time. It takes about 8 minutes.</p>
+  <button class="btn" id="start">Start Part 1</button>
 </div></div></section>
 
+<!-- Part 1: item-level -->
+<section class="screen" id="item">
+  <div class="prog"><i id="progBar"></i></div>
+  <div class="ihead">
+    <p class="eyebrow" id="itemCount"></p>
+    <h1 id="itemName"></h1>
+    <p class="q">Which photo makes you most want to order this?</p>
+  </div>
+  <div class="trio" id="trio"></div>
+  <div class="foot"><div class="in">
+    <span class="msg" id="itemMsg">Tap a photo to choose it. Say out loud why.</span>
+    <button class="btn" id="itemNext" disabled>Next dish</button>
+  </div></div>
+</section>
+
+<!-- Part 2 intro -->
+<section class="screen" id="part2"><div class="center"><div class="card">
+  <p class="eyebrow">Part 2 of 2</p>
+  <h1>Now compare full menus</h1>
+  <p>You'll see the diner's menu shown two ways. Tap between the two menus at the top as often as you like, scroll through all the dishes, then answer two quick questions.</p>
+  <p class="hint">There are 2 rounds.</p>
+  <button class="btn" id="startMenus">Start Part 2</button>
+</div></div></section>
+
+<!-- Part 2: photo-grid menu -->
 <section class="screen" id="compare">
   <div class="bar">
     <span class="round" id="roundLbl"></span>
@@ -75,13 +134,18 @@
     <button class="btn" id="ready" disabled>I'm ready to answer</button>
     <p class="tip" id="tip">Look at both menus before you answer.</p>
   </div>
-  <div class="frames"><iframe id="f0" title="Menu version 1"></iframe><iframe id="f1" title="Menu version 2"></iframe></div>
+  <div class="grid-wrap">
+    <p class="rest">Crazy Otto's Diner</p>
+    <p class="rest-sub">Breakfast, lunch &amp; diner classics</p>
+    <div id="grid"></div>
+  </div>
 </section>
 
-<section class="screen" id="questions"><div class="card-wrap"><div class="card">
+<!-- Part 2 questions -->
+<section class="screen" id="questions"><div class="center"><div class="card">
   <p class="round" id="qRoundLbl"></p>
-  <div class="q"><h2>Which menu looks more appetizing?</h2><div class="opts" data-q="0"></div></div>
-  <div class="q"><h2>Which restaurant would you be more likely to order from?</h2><div class="opts" data-q="1"></div></div>
+  <div class="qq"><h2>Which menu looks more appetizing?</h2><div class="opts" data-q="0"></div></div>
+  <div class="qq"><h2>Which restaurant would you be more likely to order from?</h2><div class="opts" data-q="1"></div></div>
   <p class="hint">Please say out loud <b>why</b> you picked what you did.</p>
   <div class="row">
     <button class="btn ghost" id="back">Look again</button>
@@ -89,81 +153,128 @@
   </div>
 </div></div></section>
 
-<section class="screen" id="done"><div class="card-wrap"><div class="card">
+<!-- Done -->
+<section class="screen" id="done"><div class="center"><div class="card">
   <h1>Thanks, you're done!</h1>
   <p>Your completion code:</p>
   <div class="code" id="code"></div>
-  <p class="hint">Please enter this code in the next question.</p>
+  <p class="hint">Please enter this code exactly in the next question.</p>
 </div></div></section>
 
+<script src="study-data.js"></script>
 <script>
-// --- randomized, blind assignment -----------------------------------------
-// Each round compares the original photos against one enhanced style.
-// Round order and which side (first/second tab) shows the enhanced menu are randomized per participant.
-const STYLES = { '2': 'm-v2/', '3': 'm-v3/' };
-const LETTERS = [['A','B'],['C','D']];
+// Versions: O = original, 2 = v2 (pro photoshoot), 3 = v3 (natural, in-restaurant).
+// Randomized per participant: Part 1 dish order and the A/B/C position of each version per dish;
+// Part 2 round order (v2 vs v3 first) and which tab shows the enhanced menu.
+// Completion code: <10 picks (O|2|3) in canonical dish order>-<round1>-<round2>,
+// where each round = <style 2|3><tab with enhanced A|B><Q1 A|B|N><Q2 A|B|N>.  Decode at decode.html.
 function rnd(){ try{ return crypto.getRandomValues(new Uint32Array(1))[0] / 2**32; }catch(e){ return Math.random(); } }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function store(k,v){ try{ if(v===undefined) return JSON.parse(sessionStorage.getItem(k)); sessionStorage.setItem(k,JSON.stringify(v)); }catch(e){ return null; } }
+const $ = id => document.getElementById(id);
+function show(id){ document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id===id)); window.scrollTo(0,0); }
 
-let plan = store('ut-plan');
-if(!plan){
-  const order = rnd() < .5 ? ['2','3'] : ['3','2'];
-  plan = order.map(s => ({ style:s, enhSide: rnd() < .5 ? 0 : 1, ans:[null,null] }));
-  store('ut-plan', plan);
+let S = store('ut2');
+if(!S){
+  S = {
+    itemOrder: shuffle(ITEMS.map(x => x.k)),
+    itemPos: ITEMS.map(() => shuffle(['O','2','3'])),
+    picks: ITEMS.map(() => null),
+    rounds: (rnd() < .5 ? ['2','3'] : ['3','2']).map(s => ({ style:s, enhSide: rnd() < .5 ? 0 : 1, ans:[null,null] })),
+  };
+  store('ut2', S);
 }
+const save = () => store('ut2', S);
+
+// ---------- Part 1 ----------
+let ii = 0;
+function preload(k){ if(k==null) return; const it = ITEMS[k]; ['O','2','3'].forEach(v => { const im = new Image(); im.src = it[v]; }); }
+function renderItem(){
+  const k = S.itemOrder[ii], it = ITEMS[k];
+  $('itemCount').textContent = 'Part 1 · Dish ' + (ii+1) + ' of ' + ITEMS.length;
+  $('progBar').style.width = (100 * ii / ITEMS.length) + '%';
+  $('itemName').textContent = it.name;
+  const trio = $('trio'); trio.innerHTML = '';
+  S.itemPos[k].forEach((v, p) => {
+    const b = document.createElement('button');
+    b.className = 'choice' + (S.picks[k]===v ? ' sel' : '');
+    b.setAttribute('aria-label', 'Photo ' + 'ABC'[p]);
+    b.innerHTML = '<img class="ph" alt="' + it.name.replace(/"/g,'&quot;') + ', photo ' + 'ABC'[p] + '" src="' + it[v] + '"><span class="lab">' + 'ABC'[p] + '</span>';
+    b.onclick = () => { S.picks[k] = v; save(); trio.querySelectorAll('.choice').forEach(c => c.classList.toggle('sel', c===b)); updItem(); };
+    trio.appendChild(b);
+  });
+  updItem();
+  preload(S.itemOrder[ii+1]);
+}
+function updItem(){
+  const k = S.itemOrder[ii];
+  $('itemNext').disabled = !S.picks[k];
+  $('itemNext').textContent = ii === ITEMS.length-1 ? 'Finish Part 1' : 'Next dish';
+}
+$('start').onclick = () => { ii = 0; renderItem(); show('item'); };
+$('itemNext').onclick = () => {
+  if(ii < ITEMS.length-1){ ii++; renderItem(); window.scrollTo(0,0); }
+  else show('part2');
+};
+
+// ---------- Part 2 ----------
+const LETTERS = [['A','B'],['C','D']];
 let r = 0, cur = 0;
 const seen = [false,false];
-const $ = id => document.getElementById(id);
-const show = id => document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id===id));
-
+function buildGrid(){
+  $('grid').innerHTML = MENU.map(c =>
+    '<section class="cat"><h2>' + c.cat + '</h2><ul class="tiles">' +
+    c.items.map((it, j) => '<li><img data-o="' + it.O + '" data-2="' + it['2'] + '" data-3="' + it['3'] + '" alt="' + it.name.replace(/"/g,'&quot;') + '" decoding="async"><div class="nm">' + it.name + '</div></li>').join('') +
+    '</ul></section>').join('');
+}
+function versionFor(tab){ const P = S.rounds[r]; return tab === P.enhSide ? P.style : 'O'; }
+function paint(tab){
+  const v = versionFor(tab), key = v === 'O' ? 'o' : v;
+  document.querySelectorAll('#grid img').forEach(im => { const src = im.dataset[key]; if(im.getAttribute('src') !== src) im.src = src; });
+}
+function preloadRound(){ ['O', S.rounds[r].style].forEach(v => MENU.forEach(c => c.items.forEach(it => { const im = new Image(); im.src = it[v]; }))); }
 function loadRound(){
-  const P = plan[r], L = LETTERS[r];
-  for(let i=0;i<2;i++){
-    const v = i===P.enhSide ? 'after' : 'before';
-    $('f'+i).src = STYLES[P.style] + '?v=' + v;
-    $('tab'+i).textContent = 'Menu ' + L[i];
-  }
-  $('roundLbl').textContent = 'Round ' + (r+1) + ' of 2';
+  const L = LETTERS[r];
+  $('tab0').textContent = 'Menu ' + L[0];
+  $('tab1').textContent = 'Menu ' + L[1];
+  $('roundLbl').textContent = 'Part 2 · Round ' + (r+1) + ' of 2';
   $('qRoundLbl').textContent = 'Round ' + (r+1) + ' of 2 · Menu ' + L[0] + ' vs Menu ' + L[1];
-  seen[0]=seen[1]=false; cur=0; pick(0, true);
-  // build answer buttons
+  seen[0] = seen[1] = false;
+  preloadRound();
+  pick(0);
   document.querySelectorAll('#questions .opts').forEach(box => {
     const q = +box.dataset.q;
     box.innerHTML = '';
-    [['A',L[0]],['B',L[1]],['N','No difference']].forEach(([val,label],j) => {
+    [['A', 'Menu ' + L[0]], ['B', 'Menu ' + L[1]], ['N', 'No difference']].forEach(([val, label], j) => {
       const b = document.createElement('button');
-      b.className = 'opt' + (j===2 ? ' wide' : '');
-      b.textContent = j===2 ? label : 'Menu ' + label;
-      b.onclick = () => { plan[r].ans[q] = val; store('ut-plan', plan);
-        box.querySelectorAll('.opt').forEach(o => o.classList.toggle('sel', o===b)); updNext(); };
-      if(plan[r].ans[q]===val) b.classList.add('sel');
+      b.className = 'opt' + (j===2 ? ' wide' : '') + (S.rounds[r].ans[q]===val ? ' sel' : '');
+      b.textContent = label;
+      b.onclick = () => { S.rounds[r].ans[q] = val; save(); box.querySelectorAll('.opt').forEach(o => o.classList.toggle('sel', o===b)); updNext(); };
       box.appendChild(b);
     });
   });
   updNext();
 }
-function scrollOf(f){ try{ return f.contentWindow.scrollY || 0; }catch(e){ return 0; } }
-function pick(i, initial){
-  const from = $('f'+cur), to = $('f'+i);
-  if(!initial && i!==cur){ try{ to.contentWindow.scrollTo(0, scrollOf(from)); }catch(e){} }
+function pick(i){
   cur = i; seen[i] = true;
-  for(let j=0;j<2;j++){ $('f'+j).classList.toggle('on', j===i); $('tab'+j).classList.toggle('on', j===i); $('tab'+j).setAttribute('aria-selected', j===i); }
+  paint(i);
+  for(let j=0;j<2;j++){ $('tab'+j).classList.toggle('on', j===i); $('tab'+j).setAttribute('aria-selected', j===i); }
   const ok = seen[0] && seen[1];
   $('ready').disabled = !ok;
   $('tip').textContent = ok ? 'Switch back and forth as much as you like.' : 'Look at both menus before you answer.';
 }
-function updNext(){ const a = plan[r].ans; $('next').disabled = !(a[0] && a[1]); $('next').textContent = r===1 ? 'Finish' : 'Next round'; }
+function updNext(){ const a = S.rounds[r].ans; $('next').disabled = !(a[0] && a[1]); $('next').textContent = r===1 ? 'Finish' : 'Next round'; }
+function code(){ return S.picks.join('') + '-' + S.rounds.map(p => p.style + 'AB'[p.enhSide] + p.ans.join('')).join('-'); }
 
-// Code per round: <style><side of enhanced A|B><Q1 A|B|N><Q2 A|B|N>, rounds joined by '-'.  Decode at decode.html.
-function code(){ return plan.map(p => p.style + 'AB'[p.enhSide] + p.ans.join('')).join('-'); }
-
-$('start').onclick = () => { show('compare'); loadRound(); };
+buildGrid();
+$('startMenus').onclick = () => { r = 0; loadRound(); show('compare'); };
 $('tab0').onclick = () => pick(0);
 $('tab1').onclick = () => pick(1);
-$('ready').onclick = () => { show('questions'); window.scrollTo(0,0); };
-$('back').onclick = () => show('compare');
+let gridY = 0;
+$('ready').onclick = () => { gridY = window.scrollY; show('questions'); };
+$('back').onclick = () => { show('compare'); window.scrollTo(0, gridY); };
 $('next').onclick = () => {
-  if(r===0){ r=1; loadRound(); show('compare'); }
+  if(r === 0){ r = 1; loadRound(); show('compare'); }
   else { $('code').textContent = code(); show('done'); }
 };
 </script>
