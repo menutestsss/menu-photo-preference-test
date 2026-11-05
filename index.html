@@ -51,6 +51,7 @@
   .ihead{margin:4px 0 16px}
   .ihead h1{font-size:24px;margin:0 0 4px}
   .ihead .q{font-size:16px;color:var(--ink2);margin:0}
+  .think{display:inline-block;font-size:14px;font-weight:500;color:#0b3d91;background:var(--selbg);border-radius:8px;padding:6px 10px;margin:10px 0 0}
   .prog{height:4px;background:var(--soft);border-radius:4px;margin:0 0 16px;overflow:hidden}
   .prog i{display:block;height:100%;background:var(--accent);transition:width .2s}
   .trio{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
@@ -154,10 +155,11 @@
     <p class="eyebrow" id="itemCount"></p>
     <h1 id="itemName"></h1>
     <p class="q">Which photo makes you most want to order this?</p>
+    <p class="think">🎙️ Think out loud: say why you're choosing the photo you pick.</p>
   </div>
   <div class="trio" id="trio"></div>
   <div class="foot"><div class="in">
-    <span class="msg" id="itemMsg">Tap a photo to choose it. Say out loud why.</span>
+    <span class="msg" id="itemMsg">Tap a photo to choose it.</span>
     <button class="btn" id="itemNext" disabled>Next dish</button>
   </div></div>
 </section>
@@ -185,6 +187,7 @@
   <div class="grid-wrap">
     <p class="rest">Crazy Otto's Diner</p>
     <p class="rest-sub">Breakfast, lunch &amp; diner classics</p>
+    <p class="think" style="margin:0 0 24px">🎙️ Think out loud as you switch menus: say what you notice and which one makes you want to order.</p>
     <div id="grid"></div>
   </div>
 </section>
@@ -194,7 +197,7 @@
   <p class="round" id="qRoundLbl"></p>
   <div class="qq"><h2>Which menu looks more appetizing?</h2><div class="opts" data-q="0"></div></div>
   <div class="qq"><h2>Which restaurant would you be more likely to order from?</h2><div class="opts" data-q="1"></div></div>
-  <p class="hint">Please say out loud <b>why</b> you picked what you did.</p>
+  <p class="think" style="margin:0 0 14px">🎙️ Before you continue, say out loud <b>why</b> you picked what you did.</p>
   <div class="row">
     <button class="btn ghost" id="back">Look again</button>
     <button class="btn" id="next" disabled>Next</button>
